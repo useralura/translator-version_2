@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor Offline</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 400px;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .language-selector {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .language-selector select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .language-selector label {
+            margin-right: 10px;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        #form-adicionar-palavra {
+            margin-top: 20px;
+        }
+
+        #form-adicionar-palavra label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #form-adicionar-palavra input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tradutor Offline</h1>
+
+        <div class="language-selector">
+            <label for="idioma-origem">Idioma de Origem:</label>
+            <select id="idioma-origem">
+                <option value="ingles">Inglês</option>
+                <option value="portugues">Português</option>
+            </select>
+
+            <label for="idioma-destino">Idioma de Destino:</label>
+            <select id="idioma-destino">
+                <option value="portugues">Português</option>
+                <option value="ingles">Inglês</option>
+            </select>
+        </div>
+
+        <textarea id="texto-origem" placeholder="Digite o texto..."></textarea>
+        <button onclick="traduzir()">Traduzir</button>
+        <textarea id="texto-destino" placeholder="Tradução..."></textarea>
+
+        <div class="error-message" id="error-message"></div>
+
+        <h2>Adicionar Palavras</h2>
+        <form id="form-adicionar-palavra">
+            <label for="palavra-ingles">Palavra em Inglês:</label>
+            <input type="text" id="palavra-ingles" required>
+
+            <label for="palavra-portugues">Tradução em Português:</label>
+            <input type="text" id="palavra-portugues" required>
+
+            <button type="submit">Adicionar</button>
+        </form>
+    </div>
+
+    <script>
+        let dicionario = {}; // Variável para armazenar o dicionário
+
+        // Carrega o dicionário do localStorage (se existir)
+        const dicionarioLocalStorage = localStorage.getItem('dicionario');
+        if (dicionarioLocalStorage) {
+            dicionario = JSON.parse(dicionarioLocalStorage);
+        } else {
+            // Dicionário inicial (opcional)
+            dicionario = {
+                "hello": "olá",
+                "world": "mundo",
+                "good": "bom",
+                "morning": "manhã",
+                "afternoon": "tarde",
+                "evening": "noite",
+                "thank": "obrigado",
+                "you": "você",
+                "for": "para",
+                "the": "o",
+                "help": "ajuda",
+                "I": "eu",
+                "am": "sou",
+                "happy": "feliz",
+                "to": "a",
+                "see": "ver",
+                "again": "novamente"
+            };
+        }
+
+        // Função para adicionar novas palavras ao dicionário
+        const formAdicionarPalavra = document.getElementById('form-adicionar-palavra');
+        formAdicionarPalavra.addEventListener('submit', (event) => {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            const palavraIngles = document.getElementById('palavra-ingles').value.toLowerCase();
+            const palavraPortugues = document.getElementById('palavra-portugues').value.toLowerCase();
+
+            // Adiciona a nova palavra ao dicionário
+            dicionario[palavraIngles] = palavraPortugues;
+
+            // Limpa os campos do formulário
+            document.getElementById('palavra-ingles').value = '';
+            document.getElementById('palavra-portugues').value = '';
+
+            // Salva o dicionário atualizado no localStorage
+            salvarDicionario();
+        });
+
+        // Função para salvar o dicionário no localStorage
+        function salvarDicionario() {
+            localStorage.setItem('dicionario', JSON.stringify(dicionario));
+        }
+
+        function traduzir() {
+            const idiomaOrigem = document.getElementById("idioma-origem").value;
+            const idiomaDestino = document.getElementById("idioma-destino").value;
+            const textoOrigem = document.getElementById("texto-origem").value.toLowerCase();
+            const textoDestino = document.getElementById("texto-destino");
+            const errorMessage = document.getElementById("error-message");
+
+            errorMessage.textContent = ""; // Limpa a mensagem de erro
+
+            if (idiomaOrigem === idiomaDestino) {
+                errorMessage.textContent = "Os idiomas de origem e destino devem ser diferentes.";
+                return;
+            }
+
+            let traducao = "";
+            const palavras = textoOrigem.split(" ");
+
+            for (const palavra of palavras) {
+                if (dicionario[palavra]) {
+                    traducao += dicionario[palavra] + " ";
+                } else {
+                    traducao += palavra + " ";
+                }
+            }
+
+            textoDestino.value = traducao.trim();
+        }
+    </script>
+</body>
+</html>
