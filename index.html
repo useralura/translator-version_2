@@ -25,10 +25,12 @@
             border-radius: 5px;
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
         }
 
         textarea {
-            width: 400px;
+            width: 100%;
             height: 150px;
             margin-bottom: 10px;
             padding: 10px;
@@ -51,6 +53,7 @@
         .language-selector {
             display: flex;
             margin-bottom: 10px;
+            width: 100%;
         }
 
         .language-selector select {
@@ -58,10 +61,12 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             margin-right: 10px;
+            flex: 1;
         }
 
         .language-selector label {
             margin-right: 10px;
+            flex: 1;
         }
 
         .error-message {
@@ -71,6 +76,7 @@
 
         #form-adicionar-palavra {
             margin-top: 20px;
+            width: 100%;
         }
 
         #form-adicionar-palavra label {
@@ -124,14 +130,12 @@
     </div>
 
     <script>
-        let dicionario = {}; // Variável para armazenar o dicionário
+        let dicionario = {};
 
-        // Carrega o dicionário do localStorage (se existir)
         const dicionarioLocalStorage = localStorage.getItem('dicionario');
         if (dicionarioLocalStorage) {
             dicionario = JSON.parse(dicionarioLocalStorage);
         } else {
-            // Dicionário inicial (opcional)
             dicionario = {
                 "hello": "olá",
                 "world": "mundo",
@@ -153,26 +157,21 @@
             };
         }
 
-        // Função para adicionar novas palavras ao dicionário
         const formAdicionarPalavra = document.getElementById('form-adicionar-palavra');
         formAdicionarPalavra.addEventListener('submit', (event) => {
-            event.preventDefault(); // Impede o envio padrão do formulário
+            event.preventDefault();
 
             const palavraIngles = document.getElementById('palavra-ingles').value.toLowerCase();
             const palavraPortugues = document.getElementById('palavra-portugues').value.toLowerCase();
 
-            // Adiciona a nova palavra ao dicionário
             dicionario[palavraIngles] = palavraPortugues;
 
-            // Limpa os campos do formulário
             document.getElementById('palavra-ingles').value = '';
             document.getElementById('palavra-portugues').value = '';
 
-            // Salva o dicionário atualizado no localStorage
             salvarDicionario();
         });
 
-        // Função para salvar o dicionário no localStorage
         function salvarDicionario() {
             localStorage.setItem('dicionario', JSON.stringify(dicionario));
         }
@@ -184,7 +183,7 @@
             const textoDestino = document.getElementById("texto-destino");
             const errorMessage = document.getElementById("error-message");
 
-            errorMessage.textContent = ""; // Limpa a mensagem de erro
+            errorMessage.textContent = "";
 
             if (idiomaOrigem === idiomaDestino) {
                 errorMessage.textContent = "Os idiomas de origem e destino devem ser diferentes.";
